@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState ,useEffect} from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import axios from 'axios';
 import './index.css';
 
 function App() {
   const [draggedId, setDraggedId] = useState(null);
-  const [data, setData] = useState('');
+  const [text, setText] = useState('');
   const [tasks, setTasks] = useState([]);
 
   function handleDrag(event) {
@@ -35,16 +36,31 @@ function App() {
   function addData() {
     setTasks((prevTasks) => [
       ...prevTasks,
-      { data: data, tag: 'green', uid: uuidv4() },
+      { text: text, tag: 'green', uid: uuidv4() },
     ]);
-    setData(''); // Clear input after adding
+    setText(''); // Clear input after adding
   }
+
+function handleSend(){
+  axios.post("http://localhost:5001/tasks/add",{
+    "text": "Learn Express.js",
+    "tag": "green",
+    "uid": "12345"
+  }
+  )
+}
 
   return (
     <div className='bg-red-300 h-screen flex flex-col justify-center items-center'>
+
+
+<button onClick={handleSend}>Send</button>
+
+
+
       <input
-        value={data}
-        onChange={(e) => setData(e.target.value)}
+        value={text} // Changed from data to text
+        onChange={(e) => setText(e.target.value)} // Changed from setData to setText
         placeholder='Add a task'
       />
       <button onClick={addData}>Add Task</button>
@@ -64,7 +80,7 @@ function App() {
               id={task.uid}
               draggable='true'
             >
-              {task.data}
+              {task.text}
             </p>
           ))}
       </div>
@@ -84,7 +100,7 @@ function App() {
               id={task.uid}
               draggable='true'
             >
-              {task.data}
+              {task.text}
             </p>
           ))}
       </div>
