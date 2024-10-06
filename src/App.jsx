@@ -22,54 +22,81 @@ function App() {
     setTasks(updatedTasks); // Set new state
   }
 
-  function handleDrop(event) {
+  async function handleDrop(event,color) {
     event.preventDefault();
     // Drop logic (if needed)
-    console.log('Item dropped');
+    
+    console.log(' dropped item uid is',draggedId);
+    console.log(' dropped item color is',color);
+await axios.post(`http://localhost:5001/tasks/update/${draggedId}`,{
+  "tag":color
+})
+
+
   }
 
   function handleStart(uid) {
     setDraggedId(uid); // Track the ID of the dragged task
     console.log('Dragging task with ID:', uid);
+  
   }
 
-  function addData() {
-    setTasks((prevTasks) => [
-      ...prevTasks,
-      { text: text, tag: 'green', uid: uuidv4() },
-    ]);
-    setText(''); // Clear input after adding
-  }
+  // function addData() {
+  //   setTasks((prevTasks) => [
+  //     ...prevTasks,
+  //     { text: text, tag: 'green', uid: uuidv4() },
+  //   ]);
+  //   setText(''); // Clear input after adding
+  // }
 
-function handleSend(){
-  axios.post("http://localhost:5001/tasks/add",{
-    "text": "Learn Express.js",
+async function handleSend(){
+  const resp=await axios.post("http://localhost:5001/tasks/add",{
+    "text": text,
     "tag": "green",
-    "uid": "12345"
+    "uid":uuidv4() 
   }
   )
+console.log(resp.data.data)
+setTasks((prevTasks) => [
+  ...prevTasks,
+  resp.data.data,
+]);
+setText(''); // Clear input after adding
+
+
+
+
+
+
+}
+
+async function getData(){
+ const resp= await axios.get("http://localhost:5001/tasks/")
+ console.log(resp.data.tasks)
+ setTasks(resp.data.tasks)
 }
 
   return (
     <div className='bg-red-300 h-screen flex flex-col justify-center items-center'>
 
 
-<button onClick={handleSend}>Send</button>
 
 
+<button onClick={getData}>Get data</button>
 
       <input
         value={text} // Changed from data to text
         onChange={(e) => setText(e.target.value)} // Changed from setData to setText
         placeholder='Add a task'
       />
-      <button onClick={addData}>Add Task</button>
+      <button onClick={handleSend}>Send</button>
+      {/* <button onClick={addData}>Add Task</button> */}
 
       <div
         onDragOver={handleDrag}
         className='bg-green-300 h-[200px] w-[200px] mt-5 flex flex-col items-center justify-center'
         onDragEnter={() => handleEnter('green')}
-        onDrop={handleDrop}
+        onDrop={(event)=>handleDrop(event,'green')}
       >
         {tasks
           .filter((task) => task.tag === 'green')
@@ -88,7 +115,7 @@ function handleSend(){
       <div
         onDragOver={handleDrag}
         onDragEnter={() => handleEnter('blue')}
-        onDrop={handleDrop}
+        onDrop={(e)=>handleDrop(e,'blue')}
         className='bg-blue-300 h-[200px] w-[200px] mt-7 flex flex-col items-center justify-center'
       >
         {tasks

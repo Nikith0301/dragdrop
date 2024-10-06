@@ -6,7 +6,7 @@ const app = express();
 
 // Middleware
 const corsOptions = {
-    origin: "https://idx.google.com/dragdrop-1708483",
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
     credentials: true, // Allow credentials if needed
 };
